@@ -1,29 +1,89 @@
+{% from 'bootstrap5/nav.html' import render_nav_item %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+
 <html>
     <head>
-        {% if title %}
-        <title>{{ title }} - microblog</title>
-        {% else %}
-        <title>microblog</title>
-        {% endif %}
+        {% block head %}
+            <!-- Required meta tags -->
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+            {% block styles %}
+                <!-- Bootstrap CSS -->
+                {{ bootstrap.load_css() }}
+
+                <!-- fontawesome -->
+                <script src="https://kit.fontawesome.com/8b6d454afa.js" crossorigin="anonymous"></script>
+
+            {% endblock %}
+
+            {% if title %}
+            <title>{{ title }} - microblog</title>
+            {% else %}
+            <title>microblog</title>
+            {% endif %}
+
+        {% endblock %}
     </head>
     <body>
-        <div>
-            Microblog:
-            <a href="{{ url_for('index') }}">Home</a>
-            {% if current_user.is_anonymous %}
-                <a href="{{ url_for('login') }}">Login</a>
-            {% else %}
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% endif %}
-        </div>
-        <hr>
+    <header class="p-3 mb-3 border-bottom">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-info text-decoration-none">
+          <i class="fa-solid fa-blog fs-3"></i>
+        </a>
 
-        <ul>
-            {% for message in get_flashed_messages() %}
-                <li>{{ message }}</li>
-            {% endfor %}
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="{{ url_for('index') }}" class="nav-link px-2 link-dark">Home</a></li>
+          <li><a href="#" class="nav-link px-2 link-dark">Explore</a></li>
         </ul>
 
-        {% block content %}{% endblock %}
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+          <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+        </form>
+
+          {% if current_user.is_authenticated %}
+          <div class="dropdown text-end">
+              <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="{{ current_user.avatar(32) }}" alt="mdo" width="32" height="32" class="rounded-circle">
+              </a>
+              <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
+                  <li><a class="dropdown-item" href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+              </ul>
+          </div>
+          {% else %}
+          <div class="col-md-3 text-end">
+              <button type="button" class="btn btn-outline-primary me-2" onclick="window.location.href='{{ url_for("login") }}'">Login</button>
+              <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for("register") }}'">Register</button>
+          </div>
+          {% endif %}
+
+      </div>
+    </div>
+  </header>
+
+
+    {{ render_messages(dismissible=True) }}
+
+    <main>
+        <div class="container-md my-5">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+        {% block scripts %}
+            <!-- Optional JavaScript -->
+            {{ bootstrap.load_js() }}
+
+            <!-- moment.js -->
+            {{ moment.include_moment() }}
+        {% endblock %}
     </body>
 </html>
